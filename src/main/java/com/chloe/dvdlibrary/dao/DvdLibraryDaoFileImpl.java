@@ -12,11 +12,13 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -32,10 +34,6 @@ public class DvdLibraryDaoFileImpl implements DvdLibraryDao {
     //dvds map to hold data in memory
     private Map <String, Dvd> dvds = new HashMap<>();  
     
-    //file name for holding the data in permanent storage.
-    //public static final String LIBRARY_FILE = "DvdLibrary.txt";
-//    public static final String LIBRARY_FILE;
-//    public static final String DELIMITER = "::";   ---- nots sure why ihad these public static
     private final String LIBRARY_FILE;  //static removed 
     private final  String DELIMITER = "::";
     
@@ -43,9 +41,11 @@ public class DvdLibraryDaoFileImpl implements DvdLibraryDao {
     public DvdLibraryDaoFileImpl() {
         LIBRARY_FILE = "DvdLibrary.txt";
     }
+    
+    //constructor to use when testing
     // required to separate the production data from the test data
-    //now we can create instances of ClassRosterFileImpl that utilise another file
-    //ensures we dont overwrite our production application data during testing.
+    //now we can create instances of DvdLibraryDaoFileImpl that utilise another file.
+    //This ensures we dont overwrite our production application data during testing.
     public DvdLibraryDaoFileImpl(String libraryTextFile) {
         LIBRARY_FILE = libraryTextFile;
     }
@@ -69,8 +69,8 @@ public class DvdLibraryDaoFileImpl implements DvdLibraryDao {
         return removedDvd;
     }
     
-    /** * (
-     * This code gets all of the DVD objects out of the DVD map as a collection by calling values() method.We pass that returned 
+    /** * 
+     * This code gets all of the DVD objects out of the DVD map as a collection by calling values() method. We pass that returned 
      * collection into a the constructor for a new ArrayList. As one of the constructors of ArrayList takes a collection as a parameter
      * we can effectively convert the collection of DVD objects into an ArrayList of DVD objects that we can return from the method.
      * @return As ArrayList implements the List interface,it can be treated as a list and so we can return an ArrayList.
@@ -88,9 +88,8 @@ public class DvdLibraryDaoFileImpl implements DvdLibraryDao {
         return dvds.get(title);
     }
 
-    
     @Override
-    public Dvd changeReleaseDate(String title, String releaseDate)throws DvdLibraryDaoException {
+    public Dvd changeReleaseDate(String title, LocalDate releaseDate)throws DvdLibraryDaoException {
         loadLibrary();
         Dvd dvdToEdit = dvds.get(title);
         dvdToEdit.setReleaseDate(releaseDate);
@@ -134,10 +133,48 @@ public class DvdLibraryDaoFileImpl implements DvdLibraryDao {
         return dvdToEdit;
     }
     
+    @Override
+    public Map<String, Dvd> getDvdsLastYears(int years) throws DvdLibraryDaoException {
+        LocalDate now = LocalDate.now();
+        LocalDate sinceThisDate = now.minusYears(years);
+        loadLibrary();
+        Map<String, Dvd> dvdsLastYears = dvds.entrySet().stream()
+                .filter((dvd) -> dvd.getValue().getReleaseDate().isAfter(sinceThisDate))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        return dvdsLastYears;
+    }
+    @Override
+    public Map<String, Dvd> getDvdsByMpaaRating(String mpaaRating) throws DvdLibraryDaoException {
+        loadLibrary();
+        Map<String, Dvd> dvdsMpaRating = dvds
+                .entrySet()
+                .stream()
+                .filter((dvd) -> dvd.getValue().getMpaaRating().equalsIgnoreCase(mpaaRating))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        return dvdsMpaRating;
+    }
+    @Override
+    public Map<String, Dvd> getDvdsByDirector(String directorName) throws DvdLibraryDaoException {
+        loadLibrary();
+        Map<String, Dvd> dvdsByDirector = dvds
+                .entrySet()
+                .stream()
+                .filter((dvd) -> dvd.getValue().getDirectorName().equalsIgnoreCase(directorName))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        return dvdsByDirector;
+    }
+    @Override
+    public Map<String, Dvd> getDvdsByStudio(String studioName) throws DvdLibraryDaoException {
+        loadLibrary();
+        Map<String, Dvd> dvdsByStudio = dvds
+                .entrySet().stream().filter((dvd) -> dvd.getValue().getStudio().equalsIgnoreCase(studioName))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        return dvdsByStudio;
+    }
+    
 
-    
+
     //FILE PERSISTENCE
-    
     // Data Marshalling & Unmarshalling
     /**
      * marshallDvd organises the DVD information from an in memory object into a
@@ -160,7 +197,6 @@ public class DvdLibraryDaoFileImpl implements DvdLibraryDao {
         dvdAsText += aDvd.getStudio();
         return dvdAsText;
     }
-    
     
     /**
      * UnmarshallDvd translates a line of text into a DVD object. 
@@ -194,7 +230,7 @@ public class DvdLibraryDaoFileImpl implements DvdLibraryDao {
         //requirements of the DVD constructor
         Dvd dvdFromFile = new Dvd(title);
         //The remaining tokens are then set into the DVD object using the appropriate setters.
-        dvdFromFile.setReleaseDate(releaseDate);
+        dvdFromFile.setReleaseDate(LocalDate.parse(releaseDate));
         dvdFromFile.setMpaaRating(mpaaRating);
         dvdFromFile.setDirectorName(directorName);
         dvdFromFile.setUserRating(userRating);

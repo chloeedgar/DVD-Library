@@ -7,12 +7,11 @@ package com.chloe.dvdlibrary.controller;
 
 import com.chloe.dvdlibrary.dao.DvdLibraryDao;
 import com.chloe.dvdlibrary.dao.DvdLibraryDaoException;
-import com.chloe.dvdlibrary.dao.DvdLibraryDaoFileImpl;
 import com.chloe.dvdlibrary.dto.Dvd;
 import com.chloe.dvdlibrary.ui.DvdLibraryView;
-import com.chloe.dvdlibrary.ui.UserIO;
-import com.chloe.dvdlibrary.ui.UserIOConsoleImpl;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -47,8 +46,7 @@ public class DvdLibraryController {
         this.view = view;
     }
     
-    
-    
+
     public void run() {
         boolean keepGoing = true;
         int menuSelection = 0;
@@ -59,30 +57,26 @@ public class DvdLibraryController {
                 switch (menuSelection) {
                         case 1:
                             createDvd();
-                            //System.out.println("create");
                             break;
                         case 2:
                             removeDvd();
-                            //System.out.println("remove");
                             break;
                         case 3:
                             editDvd();
-                            //System.out.println("edit");
                             break;
                         case 4:
                             listDvds();
-                            //System.out.println("list all");
                             break;
                         case 5:
                             getDvd();
-                            //System.out.println("display DVD info");
                             break;
                         case 6:
-                            //System.out.println("exiting");
+                            findDvds();
+                            break;
+                        case 7:
                             keepGoing = false;
                             break;
                         default:
-                            //io.print("Unknown command!");
                             unknownCommand();
                 }
             }
@@ -140,27 +134,21 @@ public class DvdLibraryController {
 
                 switch (editMenuSelection){
                     case 1:
-                        //System.out.println("1. Release date");
                         editReleaseDate(title);
                         break;
                     case 2:
-                        //System.out.println("2. MPAA rating");
                         editMpaaRating(title);
                         break;
                     case 3:
-                        //System.out.println("3. Director's name");
                         editDirectorName(title);
                         break;
                     case 4:
-                        //System.out.println("4. User rating");
                         editUserRating(title);
                         break;
                     case 5:
-                        //System.out.println("5. Studio name");
                         editStudioName(title);
                         break;
                     case 6:
-                        //System.out.println("6. Exit");
                         keepGoing = false;
                         break;
                     default:
@@ -176,7 +164,7 @@ public class DvdLibraryController {
 
     private void editReleaseDate(String title) throws DvdLibraryDaoException {
         view.displayEditReleaseDateBanner();
-        String newReleaseDate = view.getReleaseDate();
+        LocalDate newReleaseDate = view.getReleaseDate();
         Dvd editedDvd = dao.changeReleaseDate(title, newReleaseDate);
         view.displayEditResult();
     }
@@ -202,5 +190,59 @@ public class DvdLibraryController {
         Dvd editedDvd = dao.changeStudioName(title, newStudioName);
         view.displayEditResult();
     }
+    
+    private void findDvds() throws DvdLibraryDaoException {
+        view.displayFindDvdsBanner();
+            int findDvdsSelection = 0;
+            boolean keepGoing = true;
+            while (keepGoing) {
+                findDvdsSelection = view.printFindMenuAndGetSelection();
+                switch (findDvdsSelection){
+                    case 1:
+                        findMoviesLastNYears();
+                        break;
+                    case 2:
+                        findMoviesByMpaaRating();
+                        break;
+                    case 3:
+                        findMoviesByDirector();
+                        break;
+                    case 4:
+                        findMoviesByStudio();
+                        break;
+                    case 5:
+                        keepGoing = false;
+                        break;
+                    default:
+                        unknownCommand();
+                }
+//                if (keepGoing == false) {
+//                    break;
+            } 
+        }
+    private void findMoviesLastNYears() throws DvdLibraryDaoException {
+        int n = view.getNYears();
+        Map<String, Dvd> filteredDvds = dao.getDvdsLastYears(n);
+        view.displayDvds(filteredDvds);
+    }
+    
+    private void findMoviesByMpaaRating() throws DvdLibraryDaoException {
+        String mpaaRating = view.getMpaaRating();
+        Map<String, Dvd> filteredDvds = dao.getDvdsByMpaaRating(mpaaRating);
+        view.displayDvds(filteredDvds);
+    }
+    
+    private void findMoviesByDirector() throws DvdLibraryDaoException {
+        String director = view.getDirectorName();
+        Map<String, Dvd> filteredDvds = dao.getDvdsByDirector(director);
+        view.displayDvds(filteredDvds);
+    }
+    private void findMoviesByStudio() throws DvdLibraryDaoException {
+        String studio = view.getStudioName();
+        Map<String, Dvd> filteredDvds = dao.getDvdsByStudio(studio);
+        view.displayDvds(filteredDvds);
+    }
+ 
+    }
 
-}
+

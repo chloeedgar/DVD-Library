@@ -5,6 +5,8 @@
  */
 package com.chloe.dvdlibrary.ui;
 
+import java.time.LocalDate;
+
 /**
  *
  * @author User
@@ -33,5 +35,6 @@ public interface UserIO {
 
     String readString(String prompt);
     
+    LocalDate readDate (String prompt);
 }
 

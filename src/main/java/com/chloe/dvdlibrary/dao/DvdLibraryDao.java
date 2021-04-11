@@ -6,7 +6,9 @@
 package com.chloe.dvdlibrary.dao;
 
 import com.chloe.dvdlibrary.dto.Dvd;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -49,7 +51,7 @@ public interface DvdLibraryDao {
      * given DVD title
      * @throws com.chloe.dvdlibrary.dao.DvdLibraryDaoException
      */
-    Dvd changeReleaseDate(String title, String releaseDate)throws DvdLibraryDaoException;
+    Dvd changeReleaseDate(String title, LocalDate releaseDate)throws DvdLibraryDaoException;
     
     
     /**
@@ -113,6 +115,15 @@ public interface DvdLibraryDao {
      * @throws com.chloe.dvdlibrary.dao.DvdLibraryDaoException
      */
     Dvd getDvd(String title) throws DvdLibraryDaoException ;
-
-
+    
+    Map<String, Dvd> getDvdsLastYears(int years) throws DvdLibraryDaoException;
+    
+    Map<String, Dvd> getDvdsByMpaaRating(String mpaaRating) throws DvdLibraryDaoException;
+    
+    Map<String, Dvd> getDvdsByDirector(String directorName) throws DvdLibraryDaoException;
+    
+    Map<String, Dvd> getDvdsByStudio(String studioName) throws DvdLibraryDaoException;
+    
+    
+    
 }

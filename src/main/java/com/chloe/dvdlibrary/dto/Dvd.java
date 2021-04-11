@@ -5,6 +5,7 @@
  */
 package com.chloe.dvdlibrary.dto;
 
+import java.time.LocalDate;
 import java.util.Objects;
 
 /**
@@ -20,28 +21,27 @@ public class Dvd {
     
     //DVD properties
     private String title;
-    private String releaseDate;
+    private LocalDate releaseDate;
     private String mpaaRating;
     private String directorName;
     private String userRating;
     private String studio;
-
     
-    //Equals and HashCode  - I can now assert on whole DVD objects to check their equality with another
-    //DVD object
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 29 * hash + Objects.hashCode(this.title);
-        hash = 29 * hash + Objects.hashCode(this.releaseDate);
-        hash = 29 * hash + Objects.hashCode(this.mpaaRating);
-        hash = 29 * hash + Objects.hashCode(this.directorName);
-        hash = 29 * hash + Objects.hashCode(this.userRating);
-        hash = 29 * hash + Objects.hashCode(this.studio);
+        int hash = 5;
+        hash = 37 * hash + Objects.hashCode(this.title);
+        hash = 37 * hash + Objects.hashCode(this.releaseDate);
+        hash = 37 * hash + Objects.hashCode(this.mpaaRating);
+        hash = 37 * hash + Objects.hashCode(this.directorName);
+        hash = 37 * hash + Objects.hashCode(this.userRating);
+        hash = 37 * hash + Objects.hashCode(this.studio);
         return hash;
     }
 
-    @Override
+    //Equals and HashCode  - I can now assert on whole DVD objects to check their equality with another
+    //DVD object
+    @Override 
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
@@ -56,9 +56,6 @@ public class Dvd {
         if (!Objects.equals(this.title, other.title)) {
             return false;
         }
-        if (!Objects.equals(this.releaseDate, other.releaseDate)) {
-            return false;
-        }
         if (!Objects.equals(this.mpaaRating, other.mpaaRating)) {
             return false;
         }
@@ -69,6 +66,9 @@ public class Dvd {
             return false;
         }
         if (!Objects.equals(this.studio, other.studio)) {
+            return false;
+        }
+        if (!Objects.equals(this.releaseDate, other.releaseDate)) {
             return false;
         }
         return true;
@@ -97,13 +97,14 @@ public class Dvd {
     //no setter for title as it is read-only as title is passed in as a parameter
     //to the constructor
 
-    public String getReleaseDate() {
+    public LocalDate getReleaseDate() {
         return releaseDate;
     }
 
-    public void setReleaseDate(String releaseDate) {
+    public void setReleaseDate(LocalDate releaseDate) {
         this.releaseDate = releaseDate;
     }
+    
 
     public String getMpaaRating() {
         return mpaaRating;
